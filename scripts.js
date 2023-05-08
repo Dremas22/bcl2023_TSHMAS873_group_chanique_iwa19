@@ -35,7 +35,7 @@ let extracted = books.slice(0, 36)
 let fragment = document.createDocumentFragment();
 for (const { author, image, title, id } of extracted) {
     const fragment = document.createDocumentFragment()
-    
+
     let preview = createPreview({
         author,
         id,
@@ -43,7 +43,7 @@ for (const { author, image, title, id } of extracted) {
         title
     })
     fragment.appendChild(preview)
-   
+
 }
 
 fragment = document.createDocumentFragment()
@@ -65,14 +65,13 @@ for (const { author, id, image, title } of extracted) {
             </div>
         `
     fragment.appendChild(element)
-
 }
 listItems.appendChild(fragment)
-
 
 /**
  * CREATING FRAGMENTS THAT COTAIN DOCUMENT OBJECT ELEMENTS FOR OBJECT GENRE AND OBJECT AUTHOR
  */
+
 const genresFrag = document.createDocumentFragment();
 let element = document.createElement('option');
 element.value = 'any';
@@ -111,18 +110,23 @@ cancelSearch.addEventListener('click', () => {
     document.querySelector('[data-search-overlay]').open = false
 })
 
-const cancelSett = document.querySelector('[data-settings-cancel]')
+const cancelSett = document.querySelector('[data-settings-cancel]');
 cancelSett.addEventListener('click', () => {
     document.querySelector('[data-settings-overlay]').open = false
 });
 
-const settForm = document.querySelector('[data-header-settings]')
+const closeList = document.querySelector('[data-list-close]')
+closeList.addEventListener('click', () => {
+    document.querySelector('[data-list-active]').open = false;
+})
+
+const settForm = document.querySelector('[data-header-settings]');
 settForm.addEventListener('click', (e) => {
     e.preventDefault()
     document.querySelector('[data-settings-overlay]').open = true
 });
 
-const searchData = document.querySelector('[data-header-search]')
+const searchData = document.querySelector('[data-header-search]');
 searchData.addEventListener('click', () => {
 
     document.querySelector('[data-search-overlay]').open = true
@@ -130,12 +134,12 @@ searchData.addEventListener('click', () => {
 
 });
 
-//--=CONTROLS SCROLLING
+//--=CONTROLS SCROLLING BOOKS PAGES ---//
 
 const listBtn = document.querySelector('[data-list-button]')
 listBtn.innerText = `Show more: ${(books.length - BOOKS_PER_PAGE)}`
 
-listBtn.innerHTML = /* html */ [
+listBtn.innerHTML = /* html */[
     `<span>Show more</span>,
     <span class="list__remaining"> (${matches.length - [page * BOOKS_PER_PAGE] > 0 ? matches.length - [page * BOOKS_PER_PAGE] : 0})</span>`
 ]
@@ -236,31 +240,8 @@ searchForm.addEventListener('submit', (event) => {
 
 });
 
-
-
-listItems.addEventListener('submit', (event) => {
-
-    document.querySelector('[data-list-active]').open = true;
-
-    const pathArray = Array.from(event.path || event.composedPath())
-    let active = null;
-    for (const node of pathArray) {
-        if (active) break;
-        for (const singleBook of books) {
-            let previewId = node?.dataset?.preview
-            if (singleBook.id === previewId) active = singleBook
-            break;
-        }
-
-    }
-
-})
-
-
-
-
 /**
- * CHANGING THE BACKGROUND ANF TEXT THEME OF THE OVERALL PAGE
+ * CHANGING THE BACKGROUND THEME AND TEXT COLOR OF THE OVERALL PAGE
  */
 
 const day = {
@@ -273,42 +254,70 @@ const night = {
     light: '10, 10, 20',
 }
 
+//-------------------APPLY INITIAL THEME---------------------//
 
-// const theme = document.querySelector('[data-settings-theme]')
-// theme.value === window.matchMedia && window.matchMedia(`(prefers-color-scheme: ${day.dark})`).matches ? 'night' : 'day'
-// let v = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'night' : 'day'
+const themeSett = document.querySelector('[data-settings-theme]');
+const formSettings = document.querySelector('[data-settings-overlay]');
 
-// theme.style.setProperty('--color-dark', [v].dark);
-// theme.style.setProperty('--color-light', [v].light);
+if (themeSett.value === 'night') {
+    document.documentElement.style.setProperty('--color-dark', night.dark);
+    document.documentElement.style.setProperty('--color-light', night.light);
+} else {
+    document.documentElement.style.setProperty('--color-dark', day.dark);
+    document.documentElement.style.setProperty('--color-light', day.light);
+}
 
-// const submitSett = document.querySelector('[form="settings"]')
-// submitSett.addEventListener('submit', (event) => {
-//     event.preventDefault()
-//     const formData = new FormData(event.target)
-//     const result = Object.fromEntries(formData)
-//     document.documentElement.style.setProperty('--color-dark', css[result.theme].dark);
-//     document.documentElement.style.setProperty('--color-light', css[result.theme].light);
-//     document.querySelector('[data-settings-overlay]').open === false
-// })
+//--- Apply selected theme on form submit-----//
 
-// if (!active) return;
-    // imgList.setAttribute('src', active.image)
-    // blurList.style.backgroundImage = `url(${active.image})`;
-    // titleList.textContent = active.title;
-    // subtitle.textContent = `${authors[active.author]} (${new Date(active.published).getFullYear()})`;
-    // description.textContent = active.description;
+formSettings.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const result = Object.fromEntries(formData);
+    if (result.theme === 'night') {
+        document.documentElement.style.setProperty('--color-dark', night.dark);
+        document.documentElement.style.setProperty('--color-light', night.light);
+    } else {
+        document.documentElement.style.setProperty('--color-dark', day.dark);
+        document.documentElement.style.setProperty('--color-light', day.light);
+    }
+    formSettings.open = false;
+});
 
-// const imgList = document.querySelector('[data-list-image]');
-// const blurList = document.querySelector('[data-list-blur]');
-// const titleList = document.querySelector('[data-list-title]');
-// const subtitle =  document.querySelector('[data-list-subtitle]');
-// const description = document.querySelector('[data-list-description]');
+//---PREIVIEWING A BOOK WHEN CLICKING ON A BOOK'S IMAGE BUTTON-----//
 
-// closeList.addEventListener('click', (e) => {
-//     e.preventDefault();
 
-//     document.querySelector('[data-list-active]').close = true
+listItems.addEventListener('click', (event) => {
 
-// })
+    const pathArray = Array.from(event.path || event.composedPath());
+    const activeList = document.querySelector('[data-list-active]');
+    const listBlur = document.querySelector('[data-list-blur]');
+    const imageList = document.querySelector('[data-list-image]');
+    const titleList = document.querySelector('[data-list-title]');
+    const subtitle = document.querySelector('[data-list-subtitle]');
+    let description = document.querySelector('[data-list-description]');
+    let active;
+    for (const node of pathArray) {
+        if (active) {
+            break;
+        }
+        const previewId = node?.dataset?.preview;
 
+        for (const singleBook of books) {
+            if (singleBook.id === previewId) active = singleBook;
+
+        }
+    }
+
+    if (!active) return;
+
+
+    activeList.open = true;
+    listBlur.style.background = `url(${active.image})`
+    imageList.setAttribute('src', active.image)
+    titleList.innerHTML = active.title;
+    subtitle.innerHTML = `${authors[active.author]} (${new Date(active.published).getFullYear()})`;
+    description.innerHTML = active.description;
+
+
+})
 
