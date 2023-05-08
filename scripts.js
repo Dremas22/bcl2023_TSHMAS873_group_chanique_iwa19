@@ -240,6 +240,42 @@ searchForm.addEventListener('submit', (event) => {
 
 });
 
+//---PREIVIEWING A BOOK WHEN CLICKING ON A BOOK'S IMAGE BUTTON-----//
+
+listItems.addEventListener('click', (event) => {
+
+    const pathArray = Array.from(event.path || event.composedPath());
+    const activeList = document.querySelector('[data-list-active]');
+    const listBlur = document.querySelector('[data-list-blur]');
+    const imageList = document.querySelector('[data-list-image]');
+    const titleList = document.querySelector('[data-list-title]');
+    const subtitle = document.querySelector('[data-list-subtitle]');
+    let description = document.querySelector('[data-list-description]');
+
+    let active;
+    for (const node of pathArray) {
+        if (active) {
+            break;
+        }
+        const previewId = node?.dataset?.preview;
+
+        for (const singleBook of books) {
+            if (singleBook.id === previewId) active = singleBook;
+
+        }
+    }
+
+    if (!active) return;
+
+    activeList.open = true;
+    listBlur.style.background = `url(${active.image})`
+    imageList.setAttribute('src', active.image)
+    titleList.innerHTML = active.title;
+    subtitle.innerHTML = `${authors[active.author]} (${new Date(active.published).getFullYear()})`;
+    description.innerHTML = active.description;
+
+})
+
 /**
  * CHANGING THE BACKGROUND THEME AND TEXT COLOR OF THE OVERALL PAGE
  */
@@ -283,41 +319,5 @@ formSettings.addEventListener('submit', (event) => {
     formSettings.open = false;
 });
 
-//---PREIVIEWING A BOOK WHEN CLICKING ON A BOOK'S IMAGE BUTTON-----//
 
-
-listItems.addEventListener('click', (event) => {
-
-    const pathArray = Array.from(event.path || event.composedPath());
-    const activeList = document.querySelector('[data-list-active]');
-    const listBlur = document.querySelector('[data-list-blur]');
-    const imageList = document.querySelector('[data-list-image]');
-    const titleList = document.querySelector('[data-list-title]');
-    const subtitle = document.querySelector('[data-list-subtitle]');
-    let description = document.querySelector('[data-list-description]');
-    let active;
-    for (const node of pathArray) {
-        if (active) {
-            break;
-        }
-        const previewId = node?.dataset?.preview;
-
-        for (const singleBook of books) {
-            if (singleBook.id === previewId) active = singleBook;
-
-        }
-    }
-
-    if (!active) return;
-
-
-    activeList.open = true;
-    listBlur.style.background = `url(${active.image})`
-    imageList.setAttribute('src', active.image)
-    titleList.innerHTML = active.title;
-    subtitle.innerHTML = `${authors[active.author]} (${new Date(active.published).getFullYear()})`;
-    description.innerHTML = active.description;
-
-
-})
 
